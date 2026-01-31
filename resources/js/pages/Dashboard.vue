@@ -1,6 +1,10 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link, Head, router } from '@inertiajs/vue3'
+
+defineProps({
+    tickets: Array
+});
 </script>
 
 <template>
@@ -19,13 +23,12 @@ import { Link, Head, router } from '@inertiajs/vue3'
                 <div class="page-header">
                     <h1>Visão Geral do ServiceHub</h1>
 
-                    <Link href="#" class="btn-primary">
-                    <i class="fas fa-plus"></i>
-                    Novo Ticket
+                    <Link :href="route('tickets.create')" class="btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Novo Ticket
                     </Link>
                 </div>
 
-                <!-- Tickets -->
                 <div class="card">
                     <div class="card-header">
                         <h3>Tickets Recentes</h3>
@@ -36,61 +39,72 @@ import { Link, Head, router } from '@inertiajs/vue3'
                             <tr>
                                 <th>ID</th>
                                 <th>Título</th>
-                                <th>Projeto</th>
+                                <th>Empresa / Projeto</th>
                                 <th>Data</th>
-                                <th>Status</th>
                                 <th style="width: 120px;">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>#TK-1092</td>
-                                <td>Erro na integração de API</td>
-                                <td>Projeto Alpha</td>
-                                <td>30/01/2026</td>
+                            <tr v-for="ticket in tickets.data" :key="ticket.id">
+                                <td>#TK-{{ ticket.id }}</td>
+                                <td>{{ ticket.title }}</td>
                                 <td>
-                                    <span class="status-badge status-open">Aberto</span>
+                                    <span style="font-weight: 600;">{{ ticket.company_name }}</span>
+                                    <br>
+                                    <small style="color: var(--gray-medium);">{{ ticket.project_name }}</small>
                                 </td>
+                                <td>{{ ticket.created_at }}</td>
                                 <td class="actions">
-                                    <i class="fas fa-eye action view"></i>
-                                    <i class="fas fa-pen action edit"></i>
-                                    <i class="fas fa-trash action delete"></i>
+                                    <i class="fas fa-eye action view" title="Visualizar"></i>
+                                    <i class="fas fa-pen action edit" title="Editar"></i>
+                                    <i class="fas fa-trash action delete" title="Excluir"></i>
                                 </td>
                             </tr>
 
-                            <tr>
-                                <td>#TK-1091</td>
-                                <td>Ajuste de layout mobile</td>
-                                <td>ServiceHub UI</td>
-                                <td>29/01/2026</td>
-                                <td>
-                                    <span class="status-badge status-progress">Em fila</span>
-                                </td>
-                                <td class="actions">
-                                    <i class="fas fa-eye action view"></i>
-                                    <i class="fas fa-pen action edit"></i>
-                                    <i class="fas fa-trash action delete"></i>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>#TK-1088</td>
-                                <td>Relatório mensal de vendas</td>
-                                <td>KPMG Analytics</td>
-                                <td>28/01/2026</td>
-                                <td>
-                                    <span class="status-badge status-closed">Concluído</span>
-                                </td>
-                                <td class="actions">
-                                    <i class="fas fa-eye action view"></i>
-                                    <i class="fas fa-pen action edit"></i>
-                                    <i class="fas fa-trash action delete"></i>
+                            <tr v-if="tickets.length === 0">
+                                <td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-medium);">
+                                    Nenhum ticket encontrado. Clique em "Novo Ticket" para começar.
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                    <div class="pagination-container mt-4 flex justify-between items-center p-4">
+                        <div class="text-sm text-gray-600">
+                            Mostrando de {{ tickets.from }} até {{ tickets.to }} de {{ tickets.total }} tickets
+                        </div>
+
+                        <div class="flex gap-2">
+                            <Component :is="link.url ? Link : 'span'" v-for="link in tickets.links" :key="link.label"
+                                :href="link.url" v-html="link.label"
+                                class="px-3 py-1 border rounded-md text-sm transition-colors" :class="{
+                                    'bg-blue-700 text-white border-blue-700': link.active,
+                                    'text-gray-400 border-gray-200 cursor-not-allowed': !link.url,
+                                    'hover:bg-gray-100': link.url && !link.active
+                                }" />
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
     </AppLayout>
 </template>
+
+<style scoped>
+.pagination-container {
+    border-top: 1px solid var(--border-color);
+}
+
+/* Estiliza os links de paginação */
+.pagination-container a,
+.pagination-container span {
+    min-width: 35px;
+    text-align: center;
+    display: inline-block;
+}
+
+/* Remove as setas de texto que o Laravel envia por padrão se desejar algo mais limpo */
+:deep(.pagination-container span),
+:deep(.pagination-container a) {
+    text-decoration: none;
+}
+</style>
