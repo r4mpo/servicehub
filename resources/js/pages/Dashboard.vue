@@ -93,8 +93,6 @@ defineProps({
 .pagination-container {
     border-top: 1px solid var(--border-color);
 }
-
-/* Estiliza os links de paginação */
 .pagination-container a,
 .pagination-container span {
     min-width: 35px;
@@ -102,7 +100,6 @@ defineProps({
     display: inline-block;
 }
 
-/* Remove as setas de texto que o Laravel envia por padrão se desejar algo mais limpo */
 :deep(.pagination-container span),
 :deep(.pagination-container a) {
     text-decoration: none;
