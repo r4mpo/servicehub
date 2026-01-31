@@ -1,13 +1,24 @@
 <script setup>
-import { ref } from 'vue'
-import { Head, Link, router } from '@inertiajs/vue3'
-import ApplicationMark from '@/Components/ApplicationMark.vue'
+import { ref, computed } from 'vue'
+import { Head, Link, router, usePage } from '@inertiajs/vue3'
 
 defineProps({
     title: String,
 })
 
 const showingNavigationDropdown = ref(false)
+const page = usePage()
+
+// Computed robusta: Resolve o erro de undefined e garante o fallback
+const user = computed(() => {
+    return page.props.auth?.user || { name: 'Consultor KPMG' }
+})
+
+// Gera as iniciais com segurança (evita erro de split em undefined)
+const userInitials = computed(() => {
+    const name = user.value.name || 'Consultor KPMG'
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+})
 
 const logout = () => {
     router.post(route('logout'))
@@ -16,67 +27,72 @@ const logout = () => {
 
 <template>
     <div>
-
         <Head :title="title" />
 
         <div class="min-h-screen bg-gray-100">
-            <!-- Navbar -->
-            <nav class="bg-white border-b border-gray-200">
+            <nav class="bg-[#00338D] border-b border-blue-900 shadow-lg">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="flex justify-between h-16">
-                        <!-- Logo -->
+                    <div class="flex justify-between h-16 items-center">
+                        
                         <div class="flex items-center">
                             <Link :href="route('dashboard')">
-                                <ApplicationMark class="h-9 w-auto" />
+                                <img src="https://kpmg.com/content/experience-fragments/kpmgpublic/br/pt/site/header/master/_jcr_content/root/header_v2/logo.coreimg.svg/1763768837972/logo.svg" 
+                                     alt="KPMG Logo" 
+                                     class="h-8 w-auto brightness-0 invert">
                             </Link>
                         </div>
 
-                        <!-- Desktop actions -->
                         <div class="hidden sm:flex sm:items-center gap-4">
-                            <span class="text-sm text-gray-600">
-                                {{ $page.props.auth.user.name }}
+                            <span class="text-sm text-white">
+                                Olá, <strong>{{ user.name }}</strong>
                             </span>
 
-                            <button @click="logout" class="text-sm text-red-600 hover:text-red-800 font-medium">
-                                Sair
+                            <div class="w-10 h-10 rounded-full bg-white text-[#00338D] flex items-center justify-center font-bold border-2 border-blue-400">
+                                {{ userInitials }}
+                            </div>
+
+                            <button @click="logout" class="text-white hover:text-blue-200 ml-2 transition">
+                                <i class="fas fa-sign-out-alt"></i>
                             </button>
                         </div>
 
-                        <!-- Mobile menu button -->
-                        <div class="flex items-center sm:hidden">
-                            <button @click="showingNavigationDropdown = !showingNavigationDropdown"
-                                class="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100">
-                                ☰
+                        <div class="sm:hidden flex items-center">
+                            <button @click="showingNavigationDropdown = !showingNavigationDropdown" class="text-white">
+                                <i class="fas" :class="showingNavigationDropdown ? 'fa-times' : 'fa-bars'"></i>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Mobile menu -->
-                <div v-if="showingNavigationDropdown" class="sm:hidden border-t border-gray-200">
-                    <div class="px-4 py-3 space-y-2">
-                        <div class="text-sm text-gray-700">
-                            {{ $page.props.auth.user.name }}
+                <div v-show="showingNavigationDropdown" class="sm:hidden bg-[#002a75] px-4 py-4 border-t border-blue-800">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-white text-[#00338D] flex items-center justify-center font-bold">
+                            {{ userInitials }}
                         </div>
-
-                        <button @click="logout" class="block text-sm text-red-600 hover:text-red-800">
-                            Sair
-                        </button>
+                        <span class="text-white font-medium">{{ user.name }}</span>
                     </div>
+                    <button @click="logout" class="text-red-300 text-sm font-bold flex items-center gap-2">
+                        <i class="fas fa-sign-out-alt"></i> SAIR
+                    </button>
                 </div>
             </nav>
 
-            <!-- Page Heading -->
             <header v-if="$slots.header" class="bg-white shadow">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     <slot name="header" />
                 </div>
             </header>
 
-            <!-- Page Content -->
             <main>
                 <slot />
             </main>
         </div>
     </div>
 </template>
+
+<style scoped>
+/* Adicionando a cor oficial da KPMG caso não use Tailwind purista */
+nav {
+    background-color: #00338D; 
+}
+</style>
