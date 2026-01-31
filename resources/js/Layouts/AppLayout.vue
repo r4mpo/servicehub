@@ -74,7 +74,7 @@ const logout = () => {
             </header>
 
             <!-- Page Content -->
-            <main class="py-6">
+            <main>
                 <slot />
             </main>
         </div>
