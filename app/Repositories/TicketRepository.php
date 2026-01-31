@@ -29,4 +29,34 @@ class TicketRepository extends RepositoryDefault
     {
         return $ticket->load('detail');
     }
+
+    /**
+     * Cria um novo ticket associado ao usuário autenticado
+     * @param mixed $request
+     * @return mixed
+     */
+    public function createTicket($request): mixed
+    {
+        return $request->user()->tickets()->create($request->all());
+    }
+
+    /**
+     * Cria o detailhe do ticket
+     * @param mixed $model
+     * @param mixed $request
+     * @param string|null $filePath
+     * @return void
+     */
+    public function createDetail($model, $request, $filePath): void
+    {
+        $model->detail()->create([
+            'content' => [
+                'browser' => $request->header('User-Agent'),
+                'priority' => 'medium',
+                'ip_address' => $request->ip(),
+            ],
+            'file_path' => $filePath
+        ]);
+
+    }
 }

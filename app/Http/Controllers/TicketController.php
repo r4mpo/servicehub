@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Tickets\StoreRequest;
+use App\Http\Requests\Tickets\UpdateRequest;
 use Inertia\Response;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
@@ -9,6 +11,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Services\Tickets\CreateService;
 use App\Services\Tickets\EditService;
 use App\Services\Tickets\DestroyService;
+use App\Services\Tickets\StoreService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class TicketController extends Controller
 {
@@ -16,13 +20,15 @@ class TicketController extends Controller
     private CreateService $createService;
     private EditService $editService;
     private DestroyService $destroyService;
+    private StoreService $storeService;
 
-    public function __construct(CreateService $createService, EditService $editService, DestroyService $destroyService)
+    public function __construct(CreateService $createService, EditService $editService, DestroyService $destroyService, StoreService $storeService)
     {
         parent::__construct();
         $this->createService = $createService;
         $this->editService = $editService;
         $this->destroyService = $destroyService;
+        $this->storeService = $storeService;
     }
 
     public function create(): Response
@@ -31,36 +37,10 @@ class TicketController extends Controller
         return $this->responseInertia($this->responseData);
     }
 
-    public function store(Request $request)
+    public function store(StoreRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'project_id' => 'required|exists:projects,id',
-            'title'      => 'required|max:255',
-            'description'=> 'required',
-            'attachment' => 'nullable|file|mimes:json,txt,pdf|max:2048',
-        ]);
-
-        // 1. Criar o Ticket (Master)
-        // Definimos um status padrão já que está no seu fillable
-        $ticket = $request->user()->tickets()->create(array_merge($validated, ['status' => 'Aberto']));
-
-        // 2. Preparar dados do Detail
-        $filePath = null;
-        if ($request->hasFile('attachment')) {
-            $filePath = $request->file('attachment')->store('attachments', 'public');
-        }
-
-        // 3. Criar o Detail (HasOne)
-        $ticket->detail()->create([
-            'content' => [
-                'browser'    => $request->header('User-Agent'),
-                'priority'   => 'medium',
-                'ip_address' => $request->ip(),
-            ],
-            'file_path' => $filePath
-        ]);
-
-        return redirect()->route('dashboard')->with('message', 'Ticket criado com sucesso!');
+        $this->responseData = $this->storeService->store($request);
+        return $this->responseRedirect($this->responseData);
     }
 
     public function edit(Ticket $ticket): Response
@@ -69,12 +49,12 @@ class TicketController extends Controller
         return $this->responseInertia($this->responseData);
     }
 
-    public function update(Request $request, Ticket $ticket)
+    public function update(UpdateRequest $request, Ticket $ticket)
     {
         $validated = $request->validate([
             'project_id' => 'required|exists:projects,id',
-            'title'      => 'required|string|max:255',
-            'description'=> 'required|string',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
             'attachment' => 'nullable|file|max:2048',
         ]);
 
@@ -96,8 +76,8 @@ class TicketController extends Controller
                 [
                     'file_path' => $newPath,
                     'content' => [
-                        'browser'    => $request->header('User-Agent'),
-                        'priority'   => 'updated',
+                        'browser' => $request->header('User-Agent'),
+                        'priority' => 'updated',
                         'ip_address' => $request->ip(),
                     ]
                 ]
@@ -107,7 +87,7 @@ class TicketController extends Controller
         return redirect()->route('dashboard')->with('message', 'Ticket atualizado!');
     }
 
-    public function destroy(Ticket $ticket)
+    public function destroy(Ticket $ticket): RedirectResponse
     {
         $this->responseData = $this->destroyService->destroy($ticket);
         return $this->responseRedirect($this->responseData);
