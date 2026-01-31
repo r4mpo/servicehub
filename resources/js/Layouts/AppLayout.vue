@@ -9,6 +9,7 @@ defineProps({
 
 const showingNavigationDropdown = ref(false)
 const page = usePage()
+const flash = computed(() => page.props.flash);
 
 // Computed robusta: Resolve o erro de undefined e garante o fallback
 const user = computed(() => {
@@ -28,6 +29,7 @@ const logout = () => {
 
 <template>
     <div>
+
         <Head :title="title" />
 
         <div class="min-h-screen bg-gray-100">
@@ -85,6 +87,25 @@ const logout = () => {
                 </div>
             </header>
 
+            <transition name="fade">
+                <div v-if="flash?.message" class="flash-message success">
+                    <i class="fas fa-check-circle"></i>
+                    {{ flash.message }}
+                    <button @click="flash.message = null">&times;</button>
+                </div>
+            </transition>
+
+            <transition name="fade">
+                <div v-if="flash?.error" class="flash-message error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    {{ flash.error }}
+                    <button @click="flash.error = null">&times;</button>
+                </div>
+            </transition>
+            
+            <main>
+                <slot />
+            </main>
             <main>
                 <slot />
             </main>
@@ -95,5 +116,47 @@ const logout = () => {
 <style scoped>
 nav {
     background-color: #00338D;
+}
+
+.flash-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 4px;
+    color: white;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.success {
+    background-color: #00a331;
+}
+
+/* Verde KPMG */
+.error {
+    background-color: #d32f2f;
+}
+
+.flash-message button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>

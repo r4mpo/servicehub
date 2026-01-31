@@ -3,7 +3,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link, Head, router } from '@inertiajs/vue3'
 
 defineProps({
-    tickets: Array
+    tickets: Object
 });
 
 const deleteTicket = (id) => {
