@@ -59,4 +59,19 @@ class TicketRepository extends RepositoryDefault
         ]);
 
     }
+
+    public function createOrUpdateDetail($model, $request, $filePath): void
+    {
+        $model->detail()->updateOrCreate(
+            ['ticket_id' => $model->id],
+            [
+                'file_path' => $filePath,
+                'content' => [
+                    'browser' => $request->header('User-Agent'),
+                    'priority' => 'updated',
+                    'ip_address' => $request->ip(),
+                ]
+            ]
+        );
+    }
 }
