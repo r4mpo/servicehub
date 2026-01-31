@@ -11,6 +11,7 @@ class TicketDetail extends Model
     use HasFactory;
 
     protected $fillable = ['ticket_id', 'content', 'file_path'];
+    
     protected $casts = ['content' => 'array'];
 
     public function ticket(): BelongsTo
