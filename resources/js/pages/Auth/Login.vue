@@ -24,10 +24,12 @@ const submit = () => {
 </script>
 
 <template>
+    <Head title="Login" />
+
     <div class="login-page">
         <div class="login-card">
             <div class="login-logo">
-                <img :src="logoUrl" alt="KPMG Logo"/>
+                <img :src="logoUrl" alt="KPMG Logo" />
             </div>
 
             <h2 class="title">ServiceHub</h2>

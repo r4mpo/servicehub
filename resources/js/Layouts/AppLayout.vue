@@ -34,12 +34,10 @@ const logout = () => {
             <nav class="bg-[#00338D] border-b border-blue-900 shadow-lg">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between h-16 items-center">
-                        
+
                         <div class="flex items-center">
                             <Link :href="route('dashboard')">
-                                <img :src="logoUrl" 
-                                     alt="KPMG Logo" 
-                                     class="h-8 w-auto brightness-0 invert">
+                                <img :src="logoUrl" alt="KPMG Logo" class="h-8 w-auto brightness-0 invert">
                             </Link>
                         </div>
 
@@ -48,7 +46,8 @@ const logout = () => {
                                 Olá, <strong>{{ user.name }}</strong>
                             </span>
 
-                            <div class="w-10 h-10 rounded-full bg-white text-[#00338D] flex items-center justify-center font-bold border-2 border-blue-400">
+                            <div
+                                class="w-10 h-10 rounded-full bg-white text-[#00338D] flex items-center justify-center font-bold border-2 border-blue-400">
                                 {{ userInitials }}
                             </div>
 
@@ -65,9 +64,11 @@ const logout = () => {
                     </div>
                 </div>
 
-                <div v-show="showingNavigationDropdown" class="sm:hidden bg-[#002a75] px-4 py-4 border-t border-blue-800">
+                <div v-show="showingNavigationDropdown"
+                    class="sm:hidden bg-[#002a75] px-4 py-4 border-t border-blue-800">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-full bg-white text-[#00338D] flex items-center justify-center font-bold">
+                        <div
+                            class="w-10 h-10 rounded-full bg-white text-[#00338D] flex items-center justify-center font-bold">
                             {{ userInitials }}
                         </div>
                         <span class="text-white font-medium">{{ user.name }}</span>
@@ -93,6 +94,6 @@ const logout = () => {
 
 <style scoped>
 nav {
-    background-color: #00338D; 
+    background-color: #00338D;
 }
 </style>
