@@ -8,18 +8,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Services\Tickets\CreateService;
 use App\Services\Tickets\EditService;
+use App\Services\Tickets\DestroyService;
 
 class TicketController extends Controller
 {
     private array $responseData;
     private CreateService $createService;
     private EditService $editService;
+    private DestroyService $destroyService;
 
-    public function __construct(CreateService $createService, EditService $editService)
+    public function __construct(CreateService $createService, EditService $editService, DestroyService $destroyService)
     {
         parent::__construct();
         $this->createService = $createService;
         $this->editService = $editService;
+        $this->destroyService = $destroyService;
     }
 
     public function create(): Response
@@ -106,12 +109,7 @@ class TicketController extends Controller
 
     public function destroy(Ticket $ticket)
     {
-        // Deletar arquivo físico se existir no detail
-        if ($ticket->detail && $ticket->detail->file_path) {
-            Storage::disk('public')->delete($ticket->detail->file_path);
-        }
-        
-        $ticket->delete(); // O detail será deletado se houver cascade no banco
-        return redirect()->route('dashboard')->with('message', 'Ticket removido!');
+        $this->responseData = $this->destroyService->destroy($ticket);
+        return $this->responseRedirect($this->responseData);
     }
 }

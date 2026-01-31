@@ -6,9 +6,8 @@ use App\Models\Project;
 use App\Models\Ticket;
 use Illuminate\Support\Collection;
 
-class TicketRepository
+class TicketRepository extends RepositoryDefault
 {
-
     /**
      * Captura a lógica de obtenção dos projetos para o select (formulários de criação e edição)
      * @return Collection<int, array{id: int, name: string>|Illuminate\Database\Eloquent\Collection<int, array{id: mixed, name: string}>}
