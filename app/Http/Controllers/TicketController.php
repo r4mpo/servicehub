@@ -2,29 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
+use Inertia\Response;
 use App\Models\Ticket;
-use App\Models\Project;
-use App\Models\TicketDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\Tickets\CreateService;
+use App\Services\Tickets\EditService;
 
 class TicketController extends Controller
 {
-    // Padronização para Create e Edit
-    private function getProjectsForSelect()
+    private array $responseData;
+    private CreateService $createService;
+    private EditService $editService;
+
+    public function __construct(CreateService $createService, EditService $editService)
     {
-        return Project::with('company')->get()->map(fn($p) => [
-            'id' => $p->id,
-            'name' => "Projeto: {$p->name} / Empresa: {$p->company->name}"
-        ]);
+        parent::__construct();
+        $this->createService = $createService;
+        $this->editService = $editService;
     }
 
-    public function create()
+    public function create(): Response
     {
-        return Inertia::render('Tickets/Create', [
-            'projects' => $this->getProjectsForSelect()
-        ]);
+        $this->responseData = $this->createService->create();
+        return $this->responseInertia($this->responseData);
     }
 
     public function store(Request $request)
@@ -59,15 +60,10 @@ class TicketController extends Controller
         return redirect()->route('dashboard')->with('message', 'Ticket criado com sucesso!');
     }
 
-    public function edit(Ticket $ticket)
+    public function edit(Ticket $ticket): Response
     {
-        // Eager load do detail para pegar o arquivo existente
-        $ticket->load('detail');
-
-        return Inertia::render('Tickets/Edit', [
-            'ticket'   => $ticket,
-            'projects' => $this->getProjectsForSelect()
-        ]);
+        $this->responseData = $this->editService->edit($ticket);
+        return $this->responseInertia($this->responseData);
     }
 
     public function update(Request $request, Ticket $ticket)
