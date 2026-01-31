@@ -20,5 +20,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::name('tickets.')->prefix('tickets')->controller(TicketController::class)->group(function () {
         Route::get('create', 'create')->name('create');
         Route::post('store', 'store')->name('store');
+        Route::get('{ticket}/edit', 'edit')->name('edit');
+        Route::put('{ticket}', 'update')->name('update');
+        Route::delete('{ticket}', 'destroy')->name('destroy');
     });
 });

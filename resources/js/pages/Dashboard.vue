@@ -5,6 +5,12 @@ import { Link, Head, router } from '@inertiajs/vue3'
 defineProps({
     tickets: Array
 });
+
+const deleteTicket = (id) => {
+    if (confirm('Tem certeza que deseja excluir este ticket?')) {
+        router.delete(route('tickets.destroy', id));
+    }
+};
 </script>
 
 <template>
@@ -55,9 +61,13 @@ defineProps({
                                 </td>
                                 <td>{{ ticket.created_at }}</td>
                                 <td class="actions">
-                                    <i class="fas fa-eye action view" title="Visualizar"></i>
-                                    <i class="fas fa-pen action edit" title="Editar"></i>
-                                    <i class="fas fa-trash action delete" title="Excluir"></i>
+                                    <Link :href="route('tickets.edit', ticket.id)">
+                                        <i class="fas fa-pen action edit" title="Editar"></i>
+                                    </Link>
+
+                                    <button @click="deleteTicket(ticket.id)" class="bg-transparent border-none p-0">
+                                        <i class="fas fa-trash action delete" title="Excluir"></i>
+                                    </button>
                                 </td>
                             </tr>
 
@@ -93,6 +103,7 @@ defineProps({
 .pagination-container {
     border-top: 1px solid var(--border-color);
 }
+
 .pagination-container a,
 .pagination-container span {
     min-width: 35px;
