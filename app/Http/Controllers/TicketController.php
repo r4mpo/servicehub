@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Tickets\StoreRequest;
-use App\Http\Requests\Tickets\UpdateRequest;
-use App\Services\Tickets\updateService;
 use Inertia\Response;
 use App\Models\Ticket;
-use Illuminate\Support\Facades\Storage;
-use App\Services\Tickets\CreateService;
 use App\Services\Tickets\EditService;
-use App\Services\Tickets\DestroyService;
 use App\Services\Tickets\StoreService;
+use App\Services\Tickets\updateService;
+use App\Services\Tickets\CreateService;
+use App\Services\Tickets\DestroyService;
+use App\Http\Requests\Tickets\StoreRequest;
+use App\Http\Requests\Tickets\UpdateRequest;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class TicketController extends Controller
@@ -26,11 +25,11 @@ class TicketController extends Controller
     public function __construct(CreateService $createService, EditService $editService, DestroyService $destroyService, StoreService $storeService, updateService $updateService)
     {
         parent::__construct();
-        $this->createService = $createService;
         $this->editService = $editService;
-        $this->destroyService = $destroyService;
         $this->storeService = $storeService;
         $this->updateService = $updateService;
+        $this->createService = $createService;
+        $this->destroyService = $destroyService;
     }
 
     public function create(): Response

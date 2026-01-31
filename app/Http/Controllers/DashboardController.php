@@ -2,27 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
+use App\Services\DashboardService;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
+    private array $responseData;
+    private DashboardService $dashboardService;
+
+        public function __construct(DashboardService $dashboardService)
+    {
+        parent::__construct();
+        $this->dashboardService = $dashboardService;
+    }
+
+
     public function index(Request $request)
     {
-        $tickets = $request->user()->tickets()
-            ->with('project.company')
-            ->latest()
-            ->paginate(10)
-            ->through(fn($ticket) => [
-                'id' => $ticket->id,
-                'title' => $ticket->title,
-                'project_name' => $ticket->project->name,
-                'company_name' => $ticket->project->company->name,
-                'created_at' => $ticket->created_at->format('d/m/Y'),
-            ]);
-
-        return Inertia::render('Dashboard', [
-            'tickets' => $tickets
-        ]);
+        $this->responseData = $this->dashboardService->dashboard($request);
+        return $this->responseInertia($this->responseData);
     }
 }

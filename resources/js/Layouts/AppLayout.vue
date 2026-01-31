@@ -106,9 +106,6 @@ const logout = () => {
             <main>
                 <slot />
             </main>
-            <main>
-                <slot />
-            </main>
         </div>
     </div>
 </template>

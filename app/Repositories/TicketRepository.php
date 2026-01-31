@@ -4,10 +4,31 @@ namespace App\Repositories;
 
 use App\Models\Project;
 use App\Models\Ticket;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class TicketRepository extends RepositoryDefault
 {
+    /**
+     * Retorna a lista de tickets paginada para o dashboard do usuário autenticado
+     * @param mixed $request
+     * @return \Illuminate\Pagination\LengthAwarePaginator<int, array{id: int, title: string, project_name: string, company_name: string, created_at: string}>
+     */
+    public function dashboard($request): LengthAwarePaginator
+    {
+        return $request->user()->tickets()
+            ->with('project.company')
+            ->latest()
+            ->paginate(10)
+            ->through(fn($ticket) => [
+                'id' => $ticket->id,
+                'title' => $ticket->title,
+                'project_name' => $ticket->project->name,
+                'company_name' => $ticket->project->company->name,
+                'created_at' => $ticket->created_at->format('d/m/Y'),
+            ]);
+    }
+
     /**
      * Captura a lógica de obtenção dos projetos para o select (formulários de criação e edição)
      * @return Collection<int, array{id: int, name: string>|Illuminate\Database\Eloquent\Collection<int, array{id: mixed, name: string}>}
@@ -60,6 +81,13 @@ class TicketRepository extends RepositoryDefault
 
     }
 
+    /**
+     * Atualiza ou cria o detailhe do ticket
+     * @param mixed $model
+     * @param mixed $request
+     * @param string|null $filePath
+     * @return void
+     */
     public function createOrUpdateDetail($model, $request, $filePath): void
     {
         $model->detail()->updateOrCreate(
