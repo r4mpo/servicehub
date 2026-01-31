@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { Head, Link, router, usePage } from '@inertiajs/vue3'
+import logoUrl from '@/../../public/images/logo.svg';
 
 defineProps({
     title: String,
@@ -36,7 +37,7 @@ const logout = () => {
                         
                         <div class="flex items-center">
                             <Link :href="route('dashboard')">
-                                <img src="https://kpmg.com/content/experience-fragments/kpmgpublic/br/pt/site/header/master/_jcr_content/root/header_v2/logo.coreimg.svg/1763768837972/logo.svg" 
+                                <img :src="logoUrl" 
                                      alt="KPMG Logo" 
                                      class="h-8 w-auto brightness-0 invert">
                             </Link>
@@ -91,7 +92,6 @@ const logout = () => {
 </template>
 
 <style scoped>
-/* Adicionando a cor oficial da KPMG caso não use Tailwind purista */
 nav {
     background-color: #00338D; 
 }
