@@ -2,6 +2,7 @@
 
 namespace App\Services\Tickets;
 
+use App\Helpers\MailsHelpers;
 use App\Repositories\TicketRepository;
 use Illuminate\Support\Facades\Storage;
 
@@ -24,6 +25,10 @@ class updateService
     {
         $this->ticketRepository->update($model, $request->all());
         $this->updateAttachment($model, $request);
+
+        // Dispara o job para processar a notificação do ticket
+        MailsHelpers::processTicketNotification($model, $request->user(), 'Atualizado');
+
         return ['route' => 'dashboard', 'message' => 'Ticket atualizado com sucesso'];
     }
 
