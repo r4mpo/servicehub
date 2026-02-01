@@ -31,7 +31,7 @@ class StoreService
 
         return [
             'route' => 'dashboard',
-            'message' => 'Ticket criado com sucesso!'
+            'message' => __('tickets.success.created')
         ];
     }
 

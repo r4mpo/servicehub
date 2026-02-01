@@ -29,7 +29,7 @@ class updateService
         // Dispara o job para processar a notificação do ticket
         MailsHelpers::processTicketNotification($model, $request->user(), 'Atualizado');
 
-        return ['route' => 'dashboard', 'message' => 'Ticket atualizado com sucesso'];
+        return ['route' => 'dashboard', 'message' => __('tickets.success.updated')];
     }
 
     /**
