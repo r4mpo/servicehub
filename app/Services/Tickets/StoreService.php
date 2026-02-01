@@ -2,6 +2,7 @@
 
 namespace App\Services\Tickets;
 
+use App\Helpers\MailsHelpers;
 use App\Repositories\TicketRepository;
 use Illuminate\Support\Facades\Storage;
 
@@ -24,6 +25,9 @@ class StoreService
         $ticket = $this->ticketRepository->createTicket($request);
         $filePath = $this->storeAttachment($request);
         $this->ticketRepository->createDetail($ticket, $request, $filePath);
+
+        // Dispara o job para processar a notificação do ticket
+        MailsHelpers::processTicketNotification($ticket, $request->user(), 'Criado');
 
         return [
             'route' => 'dashboard',
